@@ -45,7 +45,7 @@ class InstaDismiss {
     // each 'step' in the behavior.
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
-    async* run(ctx: any) {
+    async* run(ctx) {
         ctx.log({msg: "hello world"});
         ctx.log("hello world 1")
 
