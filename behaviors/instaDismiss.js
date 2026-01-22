@@ -47,11 +47,11 @@ class InstaDismiss {
     // each 'step' in the behavior.
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
-    async *run(ctx) {
-        yield ctx.Lib.getState(ctx, "CRITICAL: Custom Behavior is RUNNING");
-        // console.log({msg: "hello world"});
+    async *run() {
         console.log("hello world 1")
-
+        // yield ctx.Lib.getState(ctx, "CRITICAL: Custom Behavior is RUNNING");
+        // console.log({msg: "hello world"});
+        
         // 1. Report starting status
         // yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
 
