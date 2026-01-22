@@ -1,4 +1,4 @@
-export class InstagramLoginFix {
+class InstagramLoginFix {
   // 1. This ID will show up in your crawl logs
   static id = "insta-login-fix";
 
