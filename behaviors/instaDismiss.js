@@ -46,8 +46,8 @@ class InstaDismiss {
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
     async* run(ctx) {
-        ctx.log({msg: "hello world"});
-        ctx.log("hello world 1")
+        // console.log({msg: "hello world"});
+        console.log("hello world 1")
 
         // 1. Report starting status
         // yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
