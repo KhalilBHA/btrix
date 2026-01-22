@@ -33,7 +33,7 @@ class InstagramDismiss {
     }
     
     // Always finish with an autoscroll to ensure content loads
-    // yield* ctx.autoScroll();
+    yield* ctx.autoScroll();
   }
 }
 
