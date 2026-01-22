@@ -50,44 +50,44 @@ class InstaDismiss {
         ctx.log("hello world 1")
 
         // 1. Report starting status
-        yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
+        // yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
 
-        const { page } = ctx;
+        // const { page } = ctx;
 
-        // 2. Small delay to let the modal pop up
-        await new Promise(r => setTimeout(r, 3000));
+        // // 2. Small delay to let the modal pop up
+        // await new Promise(r => setTimeout(r, 3000));
 
-        // 3. Define the "Not Now" or "Close" selectors
-        const selectors = [
-            'button:has-text("Not Now")',
-            'div[role="dialog"] button:has(svg[aria-label="Close"])',
-            'svg[aria-label="Close"]'
-        ];
+        // // 3. Define the "Not Now" or "Close" selectors
+        // const selectors = [
+        //     'button:has-text("Not Now")',
+        //     'div[role="dialog"] button:has(svg[aria-label="Close"])',
+        //     'svg[aria-label="Close"]'
+        // ];
 
-        let dismissed = false;
+        // let dismissed = false;
 
-        for (const selector of selectors) {
-            try {
-                const element = await page.$(selector);
-                if (element && await element.isVisible()) {
-                    await element.click();
-                    dismissed = true;
-                    yield ctx.Lib.getState(ctx, `clicked dismiss button: ${selector}`);
-                    break;
-                }
-            } catch (e) {
-                // Selector not found on this attempt
-            }
-        }
+        // for (const selector of selectors) {
+        //     try {
+        //         const element = await page.$(selector);
+        //         if (element && await element.isVisible()) {
+        //             await element.click();
+        //             dismissed = true;
+        //             yield ctx.Lib.getState(ctx, `clicked dismiss button: ${selector}`);
+        //             break;
+        //         }
+        //     } catch (e) {
+        //         // Selector not found on this attempt
+        //     }
+        // }
 
-        if (!dismissed) {
-            yield ctx.Lib.getState(ctx, "login modal not found, moving to scroll");
-        }
+        // if (!dismissed) {
+        //     yield ctx.Lib.getState(ctx, "login modal not found, moving to scroll");
+        // }
 
-        // 4. Critical: Yield the autoscroll to actually capture the page content
-        yield ctx.Lib.getState(ctx, "starting autoscroll");
-        yield* ctx.autoScroll();
+        // // 4. Critical: Yield the autoscroll to actually capture the page content
+        // yield ctx.Lib.getState(ctx, "starting autoscroll");
+        // yield* ctx.autoScroll();
 
-        yield ctx.Lib.getState(ctx, "behavior finished");
+        // yield ctx.Lib.getState(ctx, "behavior finished");
     }
 }
