@@ -36,17 +36,19 @@ class InstaDismiss {
     // and running main behavior
     async awaitPageLoad() {
         // This ensures we don't try to click before the DOM is ready
-        while (!document.body) {
-            await new Promise(r => setTimeout(r, 100));
-        }
+        // while (!document.body) {
+        //     await new Promise(r => setTimeout(r, 100));
+        // }
     }
 
     // required: the main behavior async iterator, which should yield for
     // each 'step' in the behavior.
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
-    async* run(ctx) {
+    async* run(ctx: any) {
+        ctx.log({msg: "hello world"});
         ctx.log("hello world 1")
+
         // 1. Report starting status
         yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
 
