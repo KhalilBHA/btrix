@@ -1,34 +1,54 @@
-class InstagramLoginFix {
-  // 1. This ID will show up in your crawl logs
-  static id = "insta-login-fix";
+class InstagramDismiss {
+  static id = "instagram-dismiss-login";
 
-  // 2. This determines WHERE the script runs. 
-  // Make sure this matches your target URL!
-  static isMatch(url) {
+  /**
+   * Determines if this behavior should run on the given URL.
+   * @param {string} url - The current page URL.
+   * @param {Object} ctx - The crawl context.
+   * @returns {boolean}
+   */
+  static isMatch(url, ctx) {
     return url.includes("instagram.com");
   }
 
-  // 3. The run function MUST be an async generator (async *run)
+  /**
+   * Called once when the behavior is loaded.
+   * Use this for setup logic or global configuration.
+   */
+  static async init(ctx) {
+    ctx.log("Instagram Login Dismiss behavior initialized.");
+  }
+
+  /**
+   * The main interaction logic. 
+   * Must be an async generator (async *run).
+   */
   async *run(ctx) {
     const { page } = ctx;
     
-    ctx.log("Starting Instagram login fix...");
+    // Wait for the page to load/modal to appear
+    await page.waitForTimeout(3000);
 
-    try {
-      // Wait for the modal
-      await page.waitForTimeout(4000);
+    const selectors = [
+      'button:has-text("Not Now")',
+      'div[role="dialog"] button:has(svg[aria-label="Close"])',
+      'svg[aria-label="Close"]'
+    ];
 
-      // Try to click "Not Now"
-      const button = await page.getByRole('button', { name: /Not Now/i });
-      if (await button.isVisible()) {
-        await button.click();
-        ctx.log("Clicked 'Not Now' button successfully.");
+    for (const selector of selectors) {
+      try {
+        const element = await page.$(selector);
+        if (element && await element.isVisible()) {
+          await element.click();
+          ctx.log(`Successfully dismissed login modal using: ${selector}`);
+          break;
+        }
+      } catch (err) {
+        // Silently continue to next selector
       }
-    } catch (e) {
-      ctx.log("Could not find login modal, skipping...");
     }
 
-    // Yield to the next behavior (like autoscroll)
-    yield* ctx.autoScroll();
+    // Pass control to the standard autoscroll behavior to capture the feed
+    // yield* ctx.autoScroll();
   }
 }
