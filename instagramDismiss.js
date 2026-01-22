@@ -1,40 +1,37 @@
-class InstagramDismiss {
-  static id = "instagram-dismiss-login";
+class InstagramLoginFix {
+  // 1. This ID will show up in your crawl logs
+  static id = "insta-login-fix";
 
-  // Only run this behavior on Instagram pages
-  static isMatch() {
-    return window.location.hostname.includes("instagram.com");
+  // 2. This determines WHERE the script runs. 
+  // Make sure this matches your target URL!
+  static isMatch(url) {
+    return url.includes("instagram.com");
   }
 
+  // 3. The run function MUST be an async generator (async *run)
   async *run(ctx) {
     const { page } = ctx;
     
-    // Wait for the modal to potentially appear
-    await new Promise(r => setTimeout(r, 3000));
+    ctx.log("Starting Instagram login fix...");
 
-    const selectors = [
-      'div[role="dialog"] button:has-text("Not Now")',
-      'div[role="presentation"] button:has-text("Not Now")',
-      'svg[aria-label="Close"]',
-      'button:has-text("Close")'
-    ];
+    try {
+      // Wait for the modal
+      await page.waitForTimeout(4000);
 
-    for (const selector of selectors) {
-      try {
-        const element = await page.$(selector);
-        if (element) {
-          await element.click();
-          console.log(`Clicked dismiss button: ${selector}`);
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector if not found
+      // Try to click "Not Now"
+      const button = await page.getByRole('button', { name: /Not Now/i });
+      if (await button.isVisible()) {
+        await button.click();
+        ctx.log("Clicked 'Not Now' button successfully.");
       }
+    } catch (e) {
+      ctx.log("Could not find login modal, skipping...");
     }
-    
-    // Always finish with an autoscroll to ensure content loads
+
+    // Yield to the next behavior (like autoscroll)
     yield* ctx.autoScroll();
   }
 }
 
-module.exports = InstagramDismiss;
+// Very important: Export the class
+module.exports = InstagramLoginFix;
