@@ -47,7 +47,8 @@ class InstaDismiss {
     // each 'step' in the behavior.
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
-    async* run(ctx) {
+    async *run(ctx) {
+        yield ctx.Lib.getState(ctx, "CRITICAL: Custom Behavior is RUNNING");
         // console.log({msg: "hello world"});
         console.log("hello world 1")
 
