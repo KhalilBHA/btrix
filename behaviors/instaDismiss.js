@@ -9,7 +9,9 @@ class InstaDismiss {
     // what page it is on. The first behavior that returns 'true'
     // for a given page is used on that page.
     static isMatch() {
-        return !!window.location.href.match(/https:\/\/(www\.)?instagram\.com\//);
+        console.log("Checking match for: " + window.location.href);
+        // Return true for everything just to force the 'run' method to start
+        return true;
     }
 
     // required: typically should be left as-is.
