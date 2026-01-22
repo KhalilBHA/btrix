@@ -48,10 +48,24 @@ class InstaDismiss {
     // When the iterator finishes, the behavior is done.
     // (See below for more info)
     async *run() {
-        console.log("hello world 1")
+        yield ctx.Lib.getState(ctx, "CRITICAL: Custom Behavior is RUNNING");
+
+        const { page } = ctx;
+
+        try {
+            yield ctx.Lib.getState(ctx, "Attempting to find page object...");
+            if (page) {
+                yield ctx.Lib.getState(ctx, "Page object found. Waiting 2s...");
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        } catch (e) {
+            yield ctx.Lib.getState(ctx, "ERROR in run: " + e.message);
+        }
+
+        yield* ctx.autoScroll();
         // yield ctx.Lib.getState(ctx, "CRITICAL: Custom Behavior is RUNNING");
         // console.log({msg: "hello world"});
-        
+
         // 1. Report starting status
         // yield ctx.Lib.getState(ctx, "starting instagram login dismissal");
 
