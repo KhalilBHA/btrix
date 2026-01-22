@@ -1,37 +1,32 @@
-class InstagramLoginFix {
-  // 1. This ID will show up in your crawl logs
-  static id = "insta-login-fix";
+module.exports = async ({ page }) => {
+  try {
+    console.log("Instagram behavior loaded");
 
-  // 2. This determines WHERE the script runs. 
-  // Make sure this matches your target URL!
-  static isMatch(url) {
-    return url.includes("instagram.com");
-  }
+    // Give page time to load
+    await page.waitForTimeout(4000);
 
-  // 3. The run function MUST be an async generator (async *run)
-  async *run(ctx) {
-    const { page } = ctx;
-    
-    ctx.log("Starting Instagram login fix...");
+    const selectors = [
+      'button:has-text("Not Now")',
+      'button:has-text("Not now")',
+      'button:has-text("Cancel")',
+      'button[aria-label="Close"]',
+      'svg[aria-label="Close"]'
+    ];
 
-    try {
-      // Wait for the modal
-      await page.waitForTimeout(4000);
-
-      // Try to click "Not Now"
-      const button = await page.getByRole('button', { name: /Not Now/i });
-      if (await button.isVisible()) {
-        await button.click();
-        ctx.log("Clicked 'Not Now' button successfully.");
+    for (let i = 0; i < 5; i++) {
+      for (const sel of selectors) {
+        const el = await page.$(sel);
+        if (el) {
+          await el.click();
+          console.log("Closed popup using:", sel);
+          return;
+        }
       }
-    } catch (e) {
-      ctx.log("Could not find login modal, skipping...");
+      await page.waitForTimeout(2000);
     }
 
-    // Yield to the next behavior (like autoscroll)
-    yield* ctx.autoScroll();
+    console.log("No popup detected");
+  } catch (e) {
+    console.log("Behavior error:", e.message);
   }
-}
-
-// Very important: Export the class
-module.exports = InstagramLoginFix;
+};
