@@ -8,6 +8,7 @@ class InstagramDismiss {
    * @returns {boolean}
    */
   static isMatch(url, ctx) {
+    console.log("hello world 2")
     return !!window.location.href.match(/https:\/\/(www\.)?instagram\.com\//);
   }
 
@@ -16,6 +17,7 @@ class InstagramDismiss {
    * Use this for setup logic or global configuration.
    */
   static async init(ctx) {
+    console.log("hello world 1")
     log("Instagram Login Dismiss behavior initialized.");
     ctx.log("Instagram Login Dismiss behavior initialized.");
   }
@@ -25,6 +27,7 @@ class InstagramDismiss {
    * Must be an async generator (async *run).
    */
   async *run(ctx) {
+    console.log("hello world")
     const { page } = ctx;
     
     // Wait for the page to load/modal to appear
