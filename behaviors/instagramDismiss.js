@@ -8,7 +8,7 @@ class InstagramDismiss {
    * @returns {boolean}
    */
   static isMatch(url, ctx) {
-    return url.includes("instagram.com");
+    return !!window.location.href.match(/https:\/\/(www\.)?instagram\.com\//);
   }
 
   /**
@@ -16,6 +16,7 @@ class InstagramDismiss {
    * Use this for setup logic or global configuration.
    */
   static async init(ctx) {
+    log("Instagram Login Dismiss behavior initialized.");
     ctx.log("Instagram Login Dismiss behavior initialized.");
   }
 
@@ -40,13 +41,16 @@ class InstagramDismiss {
         const element = await page.$(selector);
         if (element && await element.isVisible()) {
           await element.click();
+          log(`Successfully dismissed login modal using: ${selector}`);
           ctx.log(`Successfully dismissed login modal using: ${selector}`);
           break;
         }
       } catch (err) {
         // Silently continue to next selector
+        log(`Failed: ${err}`);
       }
     }
+    log(`Finished...`);
 
     // Pass control to the standard autoscroll behavior to capture the feed
     // yield* ctx.autoScroll();
