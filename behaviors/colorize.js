@@ -59,7 +59,7 @@ class Colorize {
     if (!found) {
       console.warn("No login modal buttons were found with the current selectors.");
       // Force background red so you know the script ran but failed to find the target
-      document.body.style.backgroundColor = "rgba(255,0,0,0.2)";
+      document.body.style.backgroundColor = "red";
     }
 
     console.log("--- Test Complete ---");
