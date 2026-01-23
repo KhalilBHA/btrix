@@ -1,8 +1,7 @@
 // Developed for https://phd.aydeethegreat.com/a-timeline-of-campus-community-and-national-events-new/
 
-class Timeline
-{
-  static id = "TimelineJS";
+class Colorize {
+  static id = "ColorizeJS";
 
   static runInIframe = true;
 
@@ -15,36 +14,54 @@ class Timeline
   }
 
   async* run(ctx) {
-    // 1. Log to the browser console (accessible in DevTools)
-    console.log("BEHAVIOR STARTING: Changing background color...");
+    console.log("--- Starting Behavior Test ---");
 
-    // 2. Direct DOM manipulation
-    // We use page.evaluate to run code directly in the browser context
-    await ctx.page.evaluate(() => {
-      document.body.style.backgroundColor = "red";
-      document.body.style.border = "10px solid blue";
-      
-      // Create a floating element so we can see it even if the background is covered
-      const div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.style.top = '0';
-      div.style.left = '0';
-      div.style.width = '100%';
-      div.style.height = '100px';
-      div.style.zIndex = '99999';
-      div.style.backgroundColor = 'yellow';
-      div.style.color = 'black';
-      div.style.fontSize = '30px';
-      div.style.textAlign = 'center';
-      div.style.paddingTop = '20px';
-      div.innerText = "CUSTOM BEHAVIOR ACTIVE";
-      document.body.appendChild(div);
-    });
+    // 1. Visual Feedback: Change background color to verify execution
+    document.body.style.border = "10px solid deepskyblue";
 
-    // 3. Wait for 5 seconds so the screenshot captures the change
-    await new Promise(r => setTimeout(r, 5000));
+    // 2. The Logic: Try to find and click the 'Not Now' button
+    // We use a variety of common Instagram selectors
+    const selectors = [
+      'button:has-text("Not Now")',
+      'div[role="dialog"] button:has(svg[aria-label="Close"])',
+      'svg[aria-label="Close"]',
+      'button._a9--._ap36._a9_1' // Common internal class name
+    ];
 
-    // 4. Yield control back to the crawler
-    yield* ctx.autoScroll();
+    let found = false;
+
+    // Search for the buttons
+    for (const selector of selectors) {
+      try {
+        // Find elements by text or CSS
+        let element;
+        if (selector.includes(':has-text')) {
+          const text = selector.match(/"(.*?)"/)[1];
+          element = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes(text));
+        } else {
+          element = document.querySelector(selector);
+        }
+
+        if (element) {
+          console.log(`Target found: ${selector}. Clicking...`);
+          element.click();
+          found = true;
+
+          // 3. Visual Feedback: Change text color to Pink if successful
+          document.querySelectorAll('*').forEach(el => el.style.color = 'deeppink');
+          break;
+        }
+      } catch (e) {
+        console.error("Error checking selector: " + selector, e);
+      }
+    }
+
+    if (!found) {
+      console.warn("No login modal buttons were found with the current selectors.");
+      // Force background red so you know the script ran but failed to find the target
+      document.body.style.backgroundColor = "rgba(255,0,0,0.2)";
+    }
+
+    console.log("--- Test Complete ---");
   }
 }
