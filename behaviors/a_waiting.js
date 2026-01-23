@@ -35,8 +35,8 @@ class Instagram {
     const el = document.querySelector('svg[aria-label="Close"]');
     if (el) {
       const clickable = el.closest('[role="button"]');
-      // clickable.click();
       clickable.style.backgroundColor = "red";
+      clickable.click();
     }
 
     // try {
