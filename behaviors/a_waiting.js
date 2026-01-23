@@ -1,7 +1,7 @@
 // Developed for https://phd.aydeethegreat.com/a-timeline-of-campus-community-and-national-events-new/
 
-class Waiting {
-  static id = "WaitingJS";
+class A_WaitingJS {
+  static id = "A_WaitingJS";
 
   static runInIframe = true;
 
