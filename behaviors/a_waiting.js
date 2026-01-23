@@ -10,7 +10,13 @@ class A_WaitingJS {
   }
 
   static init() {
-    return {};
+    return {
+      // High priority values (usually > 100) tell the engine 
+      // to prefer this over default behaviors.
+      priority: 1000, 
+      state: "initializing",
+      opts: { override: true }
+    }
   }
 
   async* run(ctx) {
