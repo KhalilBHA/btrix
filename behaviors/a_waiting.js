@@ -53,7 +53,7 @@ class Instagram {
           }
         }
 
-        await page.waitForTimeout(1000);
+        await new Promise(r => setTimeout(r, 1000));
       }
 
       console.log("No popup detected");
@@ -62,6 +62,6 @@ class Instagram {
     }
 
     // Allow crawler to continue
-    await page.waitForTimeout(2000);
+    await new Promise(r => setTimeout(r, 2000));
   }
 }
