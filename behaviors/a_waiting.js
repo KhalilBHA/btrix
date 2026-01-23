@@ -19,7 +19,7 @@ const Q = {
 };
 
 // Use the exact ID 'Instagram' to attempt to override the built-in one
-export class InstagramPostsBehavior {
+class InstagramPostsBehavior {
   static id = "Instagram";
 
   static isMatch() {
