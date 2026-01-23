@@ -18,7 +18,10 @@ const Q = {
   pageLoadWaitUntil: "//main",
 };
 
-// Use the exact ID 'Instagram' to attempt to override the built-in one
+/**
+ * We export the class with the ID 'Instagram' to match the system's internal name.
+ * This increases the chance of the loader preferring this custom version.
+ */
 class InstagramPostsBehavior {
   static id = "Instagram";
 
@@ -28,8 +31,7 @@ class InstagramPostsBehavior {
 
   static init() {
     return {
-      // Priority flag is respected by some behavior loaders to resolve conflicts
-      priority: 1000,
+      priority: 1000, // Explicitly set high priority
       state: {
         posts: 0,
         slides: 0,
@@ -44,64 +46,144 @@ class InstagramPostsBehavior {
     this.postOnlyWindow = null;
   }
 
-  async applyCustomStyles(ctx) {
+  /**
+   * NEW: Visual Feedback Method
+   * Colors h2 elements red and adds a border to the viewport
+   */
+  async applyVisualUpdates(ctx) {
     await ctx.page.evaluate(() => {
-      // Turn all H2 headers red and add a thick border to the page
-      document.querySelectorAll('h2').forEach(el => el.style.color = 'red');
-      document.body.style.border = "10px solid red";
+      // Colorize all h2 elements red
+      const headers = document.querySelectorAll('h2');
+      headers.forEach(h2 => {
+        h2.style.setProperty('color', 'red', 'important');
+        h2.style.setProperty('border', '1px solid red', 'important');
+      });
 
-      // Add a status banner to the top
-      const banner = document.createElement('div');
-      banner.style = "position:fixed;top:0;width:100%;background:red;color:white;text-align:center;z-index:9999;padding:5px;font-weight:bold;";
-      banner.innerText = "CUSTOM BEHAVIOR ACTIVE: CLICKING DISMISS...";
-      document.body.appendChild(banner);
+      // Add a visual indicator that the custom behavior is in control
+      document.body.style.border = "5px solid #ff0000";
+
+      const debugBanner = document.createElement('div');
+      debugBanner.id = "custom-behavior-banner";
+      debugBanner.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;text-align:center;font-weight:bold;padding:5px;";
+      debugBanner.innerText = "CUSTOM OVERRIDE ACTIVE";
+      document.body.appendChild(debugBanner);
     });
   }
 
-  async dismissLoginPopup(ctx) {
-    await ctx.page.evaluate(() => {
-      const btn = Array.from(document.querySelectorAll('button')).find(el =>
-        el.textContent.includes('Not Now') || el.textContent.includes('Close')
-      );
-      if (btn) btn.click();
-    });
+  // --- START OF ORIGINAL LOGIC HELPERS ---
+
+  async waitForNext(ctx, child) {
+    if (!child) return null;
+    await ctx.Lib.sleep(ctx.Lib.waitUnit);
+    if (!child.nextElementSibling) return null;
+    return child.nextElementSibling;
   }
 
-  // ... (Keep your existing helper methods: waitForNext, iterRow, etc.)
+  async *iterRow(ctx) {
+    const { RestoreState, sleep, waitUnit, xpathNode } = ctx.Lib;
+    const root = xpathNode(Q.rootPath);
+    if (!root) return;
+    let child = root.firstElementChild;
+    if (!child) return;
+    while (child) {
+      await sleep(waitUnit);
+      const restorer = new RestoreState(Q.childMatchSelect, child);
+      if (restorer.matchValue) {
+        yield child;
+        child = await restorer.restore(Q.rootPath, Q.childMatch);
+      }
+      child = await this.waitForNext(ctx, child);
+    }
+  }
+
+  async *iterSubposts(ctx) {
+    const { getState, sleep, waitUnit, xpathNode } = ctx.Lib;
+    let next = xpathNode(Q.subpostNextOnlyChevron);
+    let count = 1;
+    while (next) {
+      next.click();
+      await sleep(waitUnit * 5);
+      yield getState(ctx, `Loading Slide ${++count}`, "slides");
+      next = xpathNode(Q.subpostPrevNextChevron);
+    }
+    await sleep(waitUnit * 5);
+  }
+
+  async iterComments(ctx) {
+    const { scrollIntoView, sleep, waitUnit, waitUntil, xpathNode } = ctx.Lib;
+    const root = xpathNode(Q.commentRoot);
+    if (!root) return;
+    let child = root.firstElementChild;
+    let commentsLoaded = false;
+    const getViewRepliesButton = (child) => xpathNode(Q.viewReplies, child);
+    while (child) {
+      scrollIntoView(child);
+      commentsLoaded = true;
+      let viewReplies = getViewRepliesButton(child);
+      while (viewReplies) {
+        const orig = viewReplies.textContent;
+        viewReplies.click();
+        ctx.state.comments++;
+        await sleep(waitUnit * 2.5);
+        await waitUntil(() => orig !== viewReplies.textContent, waitUnit);
+        viewReplies = getViewRepliesButton(child);
+      }
+      child = child.nextElementSibling;
+      await sleep(waitUnit * 2.5);
+    }
+    return commentsLoaded;
+  }
+
+  async *iterPosts(ctx, next) {
+    const { getState, sleep, waitUnit, xpathNode } = ctx.Lib;
+    while (next) {
+      next.click();
+      await sleep(waitUnit * 10);
+      yield getState(ctx, "Loading Post", "posts");
+      yield* this.handleSinglePost(ctx);
+      next = xpathNode(Q.nextPost);
+      while (!next && xpathNode(Q.postLoading)) {
+        await sleep(waitUnit * 2.5);
+      }
+    }
+  }
+
+  async *handleSinglePost(ctx) {
+    const { getState, sleep } = ctx.Lib;
+    yield* this.iterSubposts(ctx);
+    yield getState(ctx, "Loaded Comments", "comments");
+    await Promise.race([this.iterComments(ctx), sleep(this.maxCommentsTime)]);
+  }
+
+  // --- MAIN RUN LOOP ---
 
   async *run(ctx) {
-    // 1. Initial visual feedback and popup dismissal
-    yield ctx.Lib.getState(ctx, "Injecting custom styles and dismissing popups");
-    await this.applyCustomStyles(ctx);
-    await this.dismissLoginPopup(ctx);
+    // 1. Run the visual updates immediately
+    await this.applyVisualUpdates(ctx);
+    yield ctx.Lib.getState(ctx, "Custom Styles Applied");
 
-    // 2. Handle single post view
+    // 2. Original Logic: Handle single post URLs
     if (window.location.pathname.startsWith("/p/")) {
       yield* this.handleSinglePost(ctx);
       return;
     }
 
-    // 3. Main Row Iteration Logic
     const { getState, scrollIntoView, sleep, waitUnit, xpathNode } = ctx.Lib;
 
+    // 3. Original Logic: Iterate through the grid
     for await (const row of this.iterRow(ctx)) {
       scrollIntoView(row);
       await sleep(waitUnit * 2.5);
-
-      // Update color of the current row to show progress
-      await ctx.page.evaluate((r) => {
-        r.style.backgroundColor = 'red';
-      }, row);
-
       yield getState(ctx, "Loading Row", "rows");
+
       const first = xpathNode(Q.firstPostInRow, row);
       yield* this.iterPosts(ctx, first);
 
       const close = xpathNode(Q.postCloseButton);
-      if (close) close.click();
+      if (close) {
+        close.click();
+      }
       await sleep(waitUnit * 5);
     }
   }
-
-  // (Include the rest of your class methods here...)
 }
