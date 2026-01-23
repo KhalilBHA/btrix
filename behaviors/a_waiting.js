@@ -43,14 +43,31 @@ class Instagram {
     ];
 
     try {
-      for (let i = 0; i < 5; i++) {
-        for (const sel of selectors) {
-          const el = await page.$(sel);
-          if (el) {
-            await el.click();
-            console.log("Closed popup using:", sel);
-            return;
+      for (let i = 0; i < 10; i++) {
+        const closed = await page.evaluate(() => {
+          const selectors = [
+            'button:has-text("Not Now")',
+            'button:has-text("Not now")',
+            'button:has-text("Cancel")',
+            'button[aria-label="Close"]',
+            'svg[aria-label="Close"]',
+            'div[role="dialog"] button',
+          ];
+
+          for (const sel of selectors) {
+            const el = document.querySelector(sel);
+            if (el) {
+              el.click();
+              return sel;
+            }
           }
+
+          return null;
+        });
+
+        if (closed) {
+          console.log("Closed modal using:", closed);
+          break;
         }
 
         await new Promise(r => setTimeout(r, 1000));
