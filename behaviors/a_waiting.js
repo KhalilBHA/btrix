@@ -18,7 +18,7 @@ const Q = {
   pageLoadWaitUntil: "//main",
 };
 
-class InstagramPostsBehavior {
+class Instagram {
   static id = "Instagram";
 
   static isMatch() {
