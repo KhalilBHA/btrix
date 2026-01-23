@@ -47,7 +47,8 @@ class Instagram {
         const el = document.querySelector(sel);
         if (el) {
           const clickable = el.closest('[role="button"]');
-          clickable.click();
+          // clickable.click();
+          clickable.style.backgroundColor = "red";
           return `clicked: ${sel}`;
         }
       }
