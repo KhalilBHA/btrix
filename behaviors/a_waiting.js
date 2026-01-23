@@ -46,30 +46,6 @@ class InstagramPostsBehavior {
     this.postOnlyWindow = null;
   }
 
-  /**
-   * NEW: Visual Feedback Method
-   * Colors h2 elements red and adds a border to the viewport
-   */
-  async applyVisualUpdates(ctx) {
-    await ctx.page.evaluate(() => {
-      // Colorize all h2 elements red
-      const headers = document.querySelectorAll('h2');
-      headers.forEach(h2 => {
-        h2.style.setProperty('color', 'red', 'important');
-        h2.style.setProperty('border', '1px solid red', 'important');
-      });
-
-      // Add a visual indicator that the custom behavior is in control
-      document.body.style.border = "5px solid #ff0000";
-
-      const debugBanner = document.createElement('div');
-      debugBanner.id = "custom-behavior-banner";
-      debugBanner.style = "position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:999999;text-align:center;font-weight:bold;padding:5px;";
-      debugBanner.innerText = "CUSTOM OVERRIDE ACTIVE";
-      document.body.appendChild(debugBanner);
-    });
-  }
-
   // --- START OF ORIGINAL LOGIC HELPERS ---
 
   async waitForNext(ctx, child) {
@@ -160,8 +136,6 @@ class InstagramPostsBehavior {
   async *run(ctx) {
     // 1. Run the visual updates immediately
     yield ctx.Lib.getState(ctx, "Running modified behavior...");
-    await this.applyVisualUpdates(ctx);
-    yield ctx.Lib.getState(ctx, "Custom Styles Applied");
 
     // 2. Original Logic: Handle single post URLs
     if (window.location.pathname.startsWith("/p/")) {
