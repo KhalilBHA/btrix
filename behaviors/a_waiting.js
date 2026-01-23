@@ -10,13 +10,22 @@ class Instagram {
   }
 
   static init() {
-    return {
-      // High priority values (usually > 100) tell the engine 
-      // to prefer this over default behaviors.
-      priority: 1000, 
-      state: "initializing",
-      opts: { override: true }
-    }
+    return {};
+  }
+
+  // optional: if true, will also check isMatch() and possibly run
+  // this behavior in each iframe.
+  // if false, or not defined, this behavior will be skipped for iframes.
+  static runInIframe = false;
+
+  // optional: if defined, provides a way to define a custom way to determine
+  // when a page has finished loading beyond the standard 'load' event.
+  //
+  // if defined, the crawler will await 'awaitPageLoad()' before moving on to
+  // post-crawl processing operations, including link extraction, screenshots,
+  // and running main behavior
+  async awaitPageLoad() {
+
   }
 
   async* run(ctx) {
