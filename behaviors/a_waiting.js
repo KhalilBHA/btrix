@@ -29,7 +29,7 @@ class Instagram {
   async* run(ctx) {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
-    await new Promise(r => setTimeout(r, 5000));
+    // await new Promise(r => setTimeout(r, 5000));
 
     console.log("Instagram custom behavior loaded");
     const el = document.querySelector('svg[aria-label="Close"]');
