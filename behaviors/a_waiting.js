@@ -34,36 +34,26 @@ class Instagram {
     console.log("Instagram custom behavior loaded");
 
     try {
-      for (let i = 0; i < 10; i++) {
-        const result = await ctx.evaluate(() => {
-          const selectors = [
-            'button:has-text("Not Now")',
-            'button:has-text("Not now")',
-            'button:has-text("Cancel")',
-            'button[aria-label="Close"]',
-            'svg[aria-label="Close"]',
-            'div[role="dialog"] button'
-          ];
+      const selectors = [
+        'button:has-text("Not Now")',
+        'button:has-text("Not now")',
+        'button:has-text("Cancel")',
+        'button[aria-label="Close"]',
+        'svg[aria-label="Close"]',
+        'div[role="dialog"] button'
+      ];
 
-          for (const sel of selectors) {
-            const el = document.querySelector(sel);
-            if (el) {
-              el.click();
-              return `clicked: ${sel}`;
-            }
-          }
-
-          return null;
-        });
-
-        if (result) {
-          console.log("Popup closed:", result);
-          break;
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const clickable = el.closest('[role="button"]');
+          clickable.click();
+          return `clicked: ${sel}`;
         }
-
-        // Wait 1s between retries
-        await new Promise(r => setTimeout(r, 1000));
       }
+
+      // Wait 1s between retries
+      await new Promise(r => setTimeout(r, 1000));
     } catch (e) {
       console.log("Behavior error:", e.message);
     }
