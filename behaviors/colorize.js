@@ -39,7 +39,7 @@ class Colorize {
     });
 
     // Keep it visible for 5 seconds for the crawler to "see" it
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 50000));
 
     yield* ctx.autoScroll();
   }
