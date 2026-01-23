@@ -32,39 +32,45 @@ class Instagram {
     await new Promise(r => setTimeout(r, 5000));
 
     console.log("Instagram custom behavior loaded");
-
-    try {
-      const selectors = [
-        'button:has-text("Not Now")',
-        'button:has-text("Not now")',
-        'button:has-text("Cancel")',
-        'button[aria-label="Close"]',
-        'svg[aria-label="Close"]',
-        'div[role="dialog"] button'
-      ];
-
-        const el = document.querySelector('svg[aria-label="Close"]');
-        if (el) {
-          const clickable = el.closest('[role="button"]');
-          // clickable.click();
-          clickable.style.backgroundColor = "red";
-          return `clicked: ${sel}`;
-        }
-      // for (const sel of selectors) {
-      //   const el = document.querySelector(sel);
-      //   if (el) {
-      //     const clickable = el.closest('[role="button"]');
-      //     // clickable.click();
-      //     clickable.style.backgroundColor = "red";
-      //     return `clicked: ${sel}`;
-      //   }
-      // }
-
-      // Wait 1s between retries
-      await new Promise(r => setTimeout(r, 1000));
-    } catch (e) {
-      console.log("Behavior error:", e.message);
+    const el = document.querySelector('svg[aria-label="Close"]');
+    if (el) {
+      const clickable = el.closest('[role="button"]');
+      // clickable.click();
+      clickable.style.backgroundColor = "red";
     }
+
+    // try {
+    //   const selectors = [
+    //     'button:has-text("Not Now")',
+    //     'button:has-text("Not now")',
+    //     'button:has-text("Cancel")',
+    //     'button[aria-label="Close"]',
+    //     'svg[aria-label="Close"]',
+    //     'div[role="dialog"] button'
+    //   ];
+
+    //   const el = document.querySelector('svg[aria-label="Close"]');
+    //   if (el) {
+    //     const clickable = el.closest('[role="button"]');
+    //     // clickable.click();
+    //     clickable.style.backgroundColor = "red";
+    //     // return `clicked: ${sel}`;
+    //   }
+    //   // for (const sel of selectors) {
+    //   //   const el = document.querySelector(sel);
+    //   //   if (el) {
+    //   //     const clickable = el.closest('[role="button"]');
+    //   //     // clickable.click();
+    //   //     clickable.style.backgroundColor = "red";
+    //   //     return `clicked: ${sel}`;
+    //   //   }
+    //   // }
+
+    //   // Wait 1s between retries
+    //   await new Promise(r => setTimeout(r, 1000));
+    // } catch (e) {
+    //   console.log("Behavior error:", e.message);
+    // }
 
     // Allow crawler to continue
     await new Promise(r => setTimeout(r, 2000));
