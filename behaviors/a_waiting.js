@@ -159,6 +159,7 @@ class InstagramPostsBehavior {
 
   async *run(ctx) {
     // 1. Run the visual updates immediately
+    yield ctx.Lib.getState(ctx, "Running modified behavior...");
     await this.applyVisualUpdates(ctx);
     yield ctx.Lib.getState(ctx, "Custom Styles Applied");
 
