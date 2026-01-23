@@ -14,31 +14,33 @@ class Colorize {
   }
 
   async* run(ctx) {
-    const overlay = document.createElement('div');
-  
-  // Set the content
-  overlay.innerHTML = '<strong>BEHAVIOR STATUS:</strong> Injection Successful! 🚀';
+    const { page } = ctx;
 
-  // Apply styles to force it to the front
-  Object.assign(overlay.style, {
-    position: 'fixed',
-    top: '20px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: '#ff0055',
-    color: 'white',
-    padding: '20px 40px',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    borderRadius: '10px',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-    zIndex: '2147483647', // Maximum possible z-index
-    pointerEvents: 'none', // Allows clicking through it if needed
-    textAlign: 'center',
-    fontFamily: 'sans-serif'
-  });
+    await page.evaluate(() => {
+      const div = document.createElement('div');
+      div.id = 'browsertrix-debug-overlay';
+      div.innerHTML = '<h1>CRAWL ACTIVE: Custom Script Running</h1>';
+      
+      // High-visibility styling
+      Object.assign(div.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        backgroundColor: 'yellow',
+        color: 'black',
+        textAlign: 'center',
+        zIndex: '9999999',
+        borderBottom: '5px solid black',
+        padding: '10px'
+      });
 
-  document.body.appendChild(overlay);
-  console.log("Overlay injected successfully.");
+      document.body.appendChild(div);
+    });
+
+    // Keep it visible for 5 seconds for the crawler to "see" it
+    await new Promise(r => setTimeout(r, 5000));
+
+    yield* ctx.autoScroll();
   }
 }
