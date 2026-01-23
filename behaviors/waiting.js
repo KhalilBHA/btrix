@@ -6,7 +6,7 @@ class Waiting {
   static runInIframe = true;
 
   static isMatch() {
-    return window.location.href.startsWith("https://www.instagram.com");
+    return true;
   }
 
   static init() {
