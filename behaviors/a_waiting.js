@@ -18,10 +18,6 @@ const Q = {
   pageLoadWaitUntil: "//main",
 };
 
-/**
- * We export the class with the ID 'Instagram' to match the system's internal name.
- * This increases the chance of the loader preferring this custom version.
- */
 class InstagramPostsBehavior {
   static id = "Instagram";
 
@@ -31,7 +27,6 @@ class InstagramPostsBehavior {
 
   static init() {
     return {
-      priority: 1000, // Explicitly set high priority
       state: {
         posts: 0,
         slides: 0,
@@ -46,98 +41,193 @@ class InstagramPostsBehavior {
     this.postOnlyWindow = null;
   }
 
-  // --- START OF ORIGINAL LOGIC HELPERS ---
+  cleanup() {
+    if (this.postOnlyWindow) {
+      this.postOnlyWindow.close();
+      this.postOnlyWindow = null;
+    }
+  }
 
   async waitForNext(ctx, child) {
     if (!child) return null;
+
     await ctx.Lib.sleep(ctx.Lib.waitUnit);
+
     if (!child.nextElementSibling) return null;
+
     return child.nextElementSibling;
   }
 
   async *iterRow(ctx) {
     const { RestoreState, sleep, waitUnit, xpathNode } = ctx.Lib;
     const root = xpathNode(Q.rootPath);
+
     if (!root) return;
+
     let child = root.firstElementChild;
     if (!child) return;
+
     while (child) {
       await sleep(waitUnit);
+
       const restorer = new RestoreState(Q.childMatchSelect, child);
+
       if (restorer.matchValue) {
         yield child;
         child = await restorer.restore(Q.rootPath, Q.childMatch);
       }
+
       child = await this.waitForNext(ctx, child);
     }
+  }
+
+  async *viewStandalonePost(ctx, origLoc) {
+    const { getState, sleep, waitUnit, waitUntil, xpathNode, xpathString } =
+      ctx.Lib;
+
+    const root = xpathNode(Q.rootPath);
+    if (!root || !root.firstElementChild) return;
+
+    const firstPostHref = xpathString(
+      Q.childMatchSelect,
+      root.firstElementChild,
+    );
+
+    yield getState(
+      ctx,
+      "Loading single post view for first post: " + firstPostHref,
+    );
+
+    window.history.replaceState({}, "", firstPostHref);
+    window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+
+    let root2 = null;
+    let root3 = null;
+
+    await sleep(waitUnit * 5);
+
+    await waitUntil(
+      () => (root2 = xpathNode(Q.rootPath)) !== root && root2,
+      waitUnit * 5,
+    );
+
+    await sleep(waitUnit * 5);
+
+    window.history.replaceState({}, "", origLoc);
+    window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+
+    await waitUntil(
+      () => (root3 = xpathNode(Q.rootPath)) !== root2 && root3,
+      waitUnit * 5,
+    );
   }
 
   async *iterSubposts(ctx) {
     const { getState, sleep, waitUnit, xpathNode } = ctx.Lib;
     let next = xpathNode(Q.subpostNextOnlyChevron);
     let count = 1;
+
     while (next) {
       next.click();
       await sleep(waitUnit * 5);
-      yield getState(ctx, `Loading Slide ${++count}`, "slides");
+
+      yield getState(
+        ctx,
+        `Loading Slide ${++count} for ${window.location.href}`,
+        "slides",
+      );
+
       next = xpathNode(Q.subpostPrevNextChevron);
     }
+
     await sleep(waitUnit * 5);
   }
 
   async iterComments(ctx) {
     const { scrollIntoView, sleep, waitUnit, waitUntil, xpathNode } = ctx.Lib;
     const root = xpathNode(Q.commentRoot);
+
     if (!root) return;
+
     let child = root.firstElementChild;
     let commentsLoaded = false;
+
     const getViewRepliesButton = (child) => xpathNode(Q.viewReplies, child);
+
     while (child) {
       scrollIntoView(child);
       commentsLoaded = true;
+
       let viewReplies = getViewRepliesButton(child);
+
       while (viewReplies) {
         const orig = viewReplies.textContent;
         viewReplies.click();
         ctx.state.comments++;
         await sleep(waitUnit * 2.5);
+
         await waitUntil(() => orig !== viewReplies.textContent, waitUnit);
+
         viewReplies = getViewRepliesButton(child);
       }
+
+      if (
+        child.nextElementSibling &&
+        child.nextElementSibling.tagName === "LI" &&
+        !child.nextElementSibling.nextElementSibling
+      ) {
+        const loadMore = xpathNode(Q.loadMore, child.nextElementSibling);
+        if (loadMore) {
+          loadMore.click();
+          ctx.state.comments++;
+          await sleep(waitUnit * 5);
+        }
+      }
+
       child = child.nextElementSibling;
       await sleep(waitUnit * 2.5);
     }
+
     return commentsLoaded;
   }
 
   async *iterPosts(ctx, next) {
     const { getState, sleep, waitUnit, xpathNode } = ctx.Lib;
+
     while (next) {
       next.click();
       await sleep(waitUnit * 10);
-      yield getState(ctx, "Loading Post", "posts");
+
+      yield getState(ctx, "Loading Post: " + window.location.href, "posts");
+
+      await fetch(window.location.href);
+
       yield* this.handleSinglePost(ctx);
+
       next = xpathNode(Q.nextPost);
+
       while (!next && xpathNode(Q.postLoading)) {
         await sleep(waitUnit * 2.5);
       }
     }
+
+    await sleep(waitUnit * 5);
   }
 
   async *handleSinglePost(ctx) {
     const { getState, sleep } = ctx.Lib;
+
     yield* this.iterSubposts(ctx);
+
     yield getState(ctx, "Loaded Comments", "comments");
-    await Promise.race([this.iterComments(ctx), sleep(this.maxCommentsTime)]);
+
+    await Promise.race([
+      this.iterComments(ctx),
+      sleep(this.maxCommentsTime),
+    ]);
   }
 
-  // --- MAIN RUN LOOP ---
-
   async *run(ctx) {
-    // 1. Run the visual updates immediately
-    yield ctx.Lib.getState(ctx, "Running modified behavior...");
-
-    // 2. Original Logic: Handle single post URLs
     if (window.location.pathname.startsWith("/p/")) {
       yield* this.handleSinglePost(ctx);
       return;
@@ -145,20 +235,35 @@ class InstagramPostsBehavior {
 
     const { getState, scrollIntoView, sleep, waitUnit, xpathNode } = ctx.Lib;
 
-    // 3. Original Logic: Iterate through the grid
     for await (const row of this.iterRow(ctx)) {
       scrollIntoView(row);
       await sleep(waitUnit * 2.5);
+
       yield getState(ctx, "Loading Row", "rows");
 
       const first = xpathNode(Q.firstPostInRow, row);
+
       yield* this.iterPosts(ctx, first);
 
       const close = xpathNode(Q.postCloseButton);
-      if (close) {
-        close.click();
-      }
+      if (close) close.click();
+
       await sleep(waitUnit * 5);
     }
+  }
+
+  async awaitPageLoad(ctx) {
+    const { Lib, log } = ctx;
+    const { assertContentValid, waitUntilNode } = Lib;
+
+    log("Using customized behavior");
+    log("Waiting for Instagram to fully load");
+
+    await waitUntilNode(Q.pageLoadWaitUntil, document, null, 10000);
+
+    assertContentValid(
+      () => !!document.querySelector("*[aria-label='New post']"),
+      "not_logged_in",
+    );
   }
 }
