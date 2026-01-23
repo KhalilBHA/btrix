@@ -30,55 +30,45 @@ class Instagram {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
     await new Promise(r => setTimeout(r, 5000));
-    // const page = ctx.page;
 
-    // console.log("Instagram custom behavior loaded");
+    console.log("Instagram custom behavior loaded");
 
-    // const selectors = [
-    //   'button:has-text("Not Now")',
-    //   'button:has-text("Not now")',
-    //   'button:has-text("Cancel")',
-    //   'button[aria-label="Close"]',
-    //   'svg[aria-label="Close"]'
-    // ];
+    try {
+      for (let i = 0; i < 10; i++) {
+        const result = await ctx.evaluate(() => {
+          const selectors = [
+            'button:has-text("Not Now")',
+            'button:has-text("Not now")',
+            'button:has-text("Cancel")',
+            'button[aria-label="Close"]',
+            'svg[aria-label="Close"]',
+            'div[role="dialog"] button'
+          ];
 
-    // try {
-    //   for (let i = 0; i < 10; i++) {
-    //     const closed = await page.evaluate(() => {
-    //       const selectors = [
-    //         'button:has-text("Not Now")',
-    //         'button:has-text("Not now")',
-    //         'button:has-text("Cancel")',
-    //         'button[aria-label="Close"]',
-    //         'svg[aria-label="Close"]',
-    //         'div[role="dialog"] button',
-    //       ];
+          for (const sel of selectors) {
+            const el = document.querySelector(sel);
+            if (el) {
+              el.click();
+              return `clicked: ${sel}`;
+            }
+          }
 
-    //       for (const sel of selectors) {
-    //         const el = document.querySelector(sel);
-    //         if (el) {
-    //           el.click();
-    //           return sel;
-    //         }
-    //       }
+          return null;
+        });
 
-    //       return null;
-    //     });
+        if (result) {
+          console.log("Popup closed:", result);
+          break;
+        }
 
-    //     if (closed) {
-    //       console.log("Closed modal using:", closed);
-    //       break;
-    //     }
+        // Wait 1s between retries
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    } catch (e) {
+      console.log("Behavior error:", e.message);
+    }
 
-    //     await new Promise(r => setTimeout(r, 1000));
-    //   }
-
-    //   console.log("No popup detected");
-    // } catch (e) {
-    //   console.log("Behavior error:", e.message);
-    // }
-
-    // // Allow crawler to continue
-    // await new Promise(r => setTimeout(r, 2000));
+    // Allow crawler to continue
+    await new Promise(r => setTimeout(r, 2000));
   }
 }
