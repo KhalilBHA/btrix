@@ -21,21 +21,6 @@ class Instagram {
   // post-crawl processing operations, including link extraction, screenshots,
   // and running main behavior
   async awaitPageLoad() {
-
-    console.log("WARCTest: awaitPageLoad started");
-
-    // Inject an image into the page, which will force the crawler to request it
-    const img = document.createElement("img");
-    img.src = "https://www.sbsinformatique.com/c/4-category_default/gaming-pc.jpg";
-    img.alt = "WARC Test Image";
-
-    // Add it to the DOM
-    document.body.appendChild(img);
-
-    console.log("WARCTest: image added -> should appear in WARC");
-
-    // Wait a few seconds so the request has time to fire
-    await new Promise(r => setTimeout(r, 5000));
     // const start = Date.now();
     // const timeout = 20000;
 
@@ -66,6 +51,41 @@ class Instagram {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
+
+    const { page } = ctx;
+    
+    console.log("!!! CUSTOM BEHAVIOR STARTING !!!");
+
+    // 1. Inject Styles and modify H2 elements
+    // We do this inside the page context so the browser renders it
+    await page.evaluate(() => {
+      console.log("Custom Script: Modifying DOM...");
+      
+      // Update H2 colors
+      const headings = document.querySelectorAll('h2');
+      headings.forEach(h2 => {
+        h2.style.setProperty('color', 'red', 'important');
+        h2.style.setProperty('background-color', 'yellow', 'important');
+        h2.innerText = "CAPTURED: " + h2.innerText;
+      });
+
+      // Add the banner
+      const banner = document.createElement("div");
+      banner.id = "behavior-signal-banner";
+      banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
+      banner.style.cssText = "position:fixed; top:0; left:0; z-index:999999; background:red; color:white; padding:10px; font-weight:bold; width:100%; text-align:center;";
+      document.body.appendChild(banner);
+    });
+
+    // 2. Log status back to Browsertrix
+    yield ctx.Lib.getState(ctx, "Visual updates applied to H2s and Banner");
+
+    // 3. Wait for a few seconds to ensure the archiver 
+    // captures the "dirty" DOM with our changes.
+    await new Promise(r => setTimeout(r, 5000));
+
+    // 4. Proceed with original logic (autoScroll)
+    yield* ctx.autoScroll();
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
