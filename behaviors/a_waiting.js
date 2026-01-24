@@ -82,10 +82,15 @@ class Instagram {
     log("Custom Behavior: run() loop started");
 
     // Inject the red banner
-    const banner = document.createElement("div");
-    banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
-    banner.style.cssText = "position:fixed; top:0; left:0; z-index:999999; background:red; color:white; padding:10px; width:100%; text-align:center; font-weight:bold;";
-    document.body.appendChild(banner);
+    
+    const el = document.querySelector('svg[aria-label="Close"]');
+      if (el) {
+        const clickable = el.closest('[role="button"]');
+        log("Custom Behavior: Clicked 'Not Now' button.");
+        clickable.click();
+        // clickable.style.backgroundColor = "red";
+        // return `clicked: ${sel}`;
+      }
 
     // Perform scrolling to ensure content is captured
     // yield* Lib.autoScroll(ctx);
