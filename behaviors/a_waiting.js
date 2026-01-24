@@ -22,18 +22,20 @@ class Instagram {
   // and running main behavior
   async awaitPageLoad() {
 
-    console.log("CUSTOM BEHAVIOR: awaitPageLoad reached");
+    console.log("WARCTest: awaitPageLoad started");
 
-    // Force a real network request that will be archived
-    const url = "/__behavior_test__?t=" + Date.now();
-    console.log("Fetching:", url);
+    // Inject an image into the page, which will force the crawler to request it
+    const img = document.createElement("img");
+    img.src = "https://httpbin.org/anything/warc-test-" + Date.now() + ".png";
+    img.alt = "WARC Test Image";
 
-    try {
-      await fetch(url, { mode: "no-cors" });
-      console.log("Fetch triggered");
-    } catch (e) {
-      console.log("Fetch error (still ok):", e.message);
-    }
+    // Add it to the DOM
+    document.body.appendChild(img);
+
+    console.log("WARCTest: image added -> should appear in WARC");
+
+    // Wait a few seconds so the request has time to fire
+    await new Promise(r => setTimeout(r, 5000));
     // const start = Date.now();
     // const timeout = 20000;
 
