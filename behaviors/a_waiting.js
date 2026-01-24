@@ -1,5 +1,5 @@
-class Instagram {
-  static id = "Instagram";
+class Colorize {
+  static id = "Colorize";
 
   static runInIframe = true;
 
