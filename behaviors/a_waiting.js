@@ -20,7 +20,25 @@ class Instagram {
   // if defined, the crawler will await 'awaitPageLoad()' before moving on to
   // post-crawl processing operations, including link extraction, screenshots,
   // and running main behavior
-  async awaitPageLoad() {
+  async awaitPageLoad(ctx) {
+    const { log } = ctx;
+    log("Custom Behavior: Running awaitPageLoad...");
+
+    // Colorize H2 elements directly
+    const headings = document.querySelectorAll('h2');
+    headings.forEach(h2 => {
+      h2.style.setProperty('color', 'red', 'important');
+      h2.style.setProperty('border', '2px solid red', 'important');
+    });
+
+    // Handle the "Not Now" button
+    const btn = Array.from(document.querySelectorAll('button')).find(el => 
+      el.textContent.includes('Not Now') || el.textContent.includes('Close')
+    );
+    if (btn) {
+      btn.click();
+      log("Custom Behavior: Clicked 'Not Now' button.");
+    }
     // const start = Date.now();
     // const timeout = 20000;
 
@@ -52,40 +70,20 @@ class Instagram {
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
 
-    const { page } = ctx;
+    const { log, Lib } = ctx;
+    log("Custom Behavior: run() loop started");
+
+    // Inject the red banner
+    const banner = document.createElement("div");
+    banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
+    banner.style.cssText = "position:fixed; top:0; left:0; z-index:999999; background:red; color:white; padding:10px; width:100%; text-align:center; font-weight:bold;";
+    document.body.appendChild(banner);
+
+    // Perform scrolling to ensure content is captured
+    yield* Lib.autoScroll(ctx);
     
-    console.log("!!! CUSTOM BEHAVIOR STARTING !!!");
-
-    // 1. Inject Styles and modify H2 elements
-    // We do this inside the page context so the browser renders it
-    await page.evaluate(() => {
-      console.log("Custom Script: Modifying DOM...");
-      
-      // Update H2 colors
-      const headings = document.querySelectorAll('h2');
-      headings.forEach(h2 => {
-        h2.style.setProperty('color', 'red', 'important');
-        h2.style.setProperty('background-color', 'yellow', 'important');
-        h2.innerText = "CAPTURED: " + h2.innerText;
-      });
-
-      // Add the banner
-      const banner = document.createElement("div");
-      banner.id = "behavior-signal-banner";
-      banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
-      banner.style.cssText = "position:fixed; top:0; left:0; z-index:999999; background:red; color:white; padding:10px; font-weight:bold; width:100%; text-align:center;";
-      document.body.appendChild(banner);
-    });
-
-    // 2. Log status back to Browsertrix
-    yield ctx.Lib.getState(ctx, "Visual updates applied to H2s and Banner");
-
-    // 3. Wait for a few seconds to ensure the archiver 
-    // captures the "dirty" DOM with our changes.
-    await new Promise(r => setTimeout(r, 5000));
-
-    // 4. Proceed with original logic (autoScroll)
-    yield* ctx.autoScroll();
+    // Final wait to ensure snapshot captures the red elements
+    await new Promise(r => setTimeout(r, 3000));
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
