@@ -25,23 +25,25 @@ class Instagram {
     const timeout = 20000;
 
     while (Date.now() - start < timeout) {
-      const banner = document.createElement("div");
-      banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
-      banner.style.position = "fixed";
-      banner.style.top = "0";
-      banner.style.left = "0";
-      banner.style.zIndex = "999999";
-      banner.style.background = "red";
-      banner.style.color = "white";
-      banner.style.padding = "10px";
-      document.body.appendChild(banner);
 
-      // if (done) {
-      //   console.log("awaitPageLoad: page ready for capture");
-      //   return;
-      // }
+      await this.evaluate(() => {
+        if (!document.getElementById("__custom_banner")) {
+          const banner = document.createElement("div");
+          banner.id = "__custom_banner";
+          banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
+          banner.style.position = "fixed";
+          banner.style.top = "0";
+          banner.style.left = "0";
+          banner.style.zIndex = "999999";
+          banner.style.background = "red";
+          banner.style.color = "white";
+          banner.style.padding = "10px";
+          document.body.appendChild(banner);
+        }
+      });
 
-      await new Promise(r => setTimeout(r, 1000));
+      // Exit early so Browsertrix doesn't timeout
+      return;
     }
   }
 
