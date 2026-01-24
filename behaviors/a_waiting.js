@@ -28,10 +28,10 @@ class Instagram {
 
   async* run(ctx) {
     // Keep it visible for 5 seconds for the crawler to "see" it
-    yield log("Using custom behavior");
+    console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
 
-    console.info("Instagram custom behavior loaded");
+    console.log("Instagram custom behavior loaded");
     const el = document.querySelector('svg[aria-label="Close"]');
     if (el) {
       const clickable = el.closest('[role="button"]');
