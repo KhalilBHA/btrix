@@ -25,20 +25,28 @@ class Instagram {
     log("Custom Behavior: Running awaitPageLoad...");
 
     // Colorize H2 elements directly
-    const headings = document.querySelectorAll('h2');
-    headings.forEach(h2 => {
-      h2.style.setProperty('color', 'red', 'important');
-      h2.style.setProperty('border', '2px solid red', 'important');
-    });
+    // const headings = document.querySelectorAll('h2');
+    // headings.forEach(h2 => {
+    //   h2.style.setProperty('color', 'red', 'important');
+    //   h2.style.setProperty('border', '2px solid red', 'important');
+    // });
 
     // Handle the "Not Now" button
-    const btn = Array.from(document.querySelectorAll('button')).find(el => 
-      el.textContent.includes('Not Now') || el.textContent.includes('Close')
-    );
-    if (btn) {
-      btn.click();
-      log("Custom Behavior: Clicked 'Not Now' button.");
-    }
+    const el = document.querySelector('svg[aria-label="Close"]');
+      if (el) {
+        const clickable = el.closest('[role="button"]');
+        log("Custom Behavior: Clicked 'Not Now' button.");
+        clickable.click();
+        // clickable.style.backgroundColor = "red";
+        // return `clicked: ${sel}`;
+      }
+    // const btn = Array.from(document.querySelectorAll('button')).find(el => 
+    //   el.textContent.includes('Not Now') || el.textContent.includes('Close')
+    // );
+    // if (clicked) {
+    //   btn.click();
+    //   log("Custom Behavior: Clicked 'Not Now' button.");
+    // }
     // const start = Date.now();
     // const timeout = 20000;
 
