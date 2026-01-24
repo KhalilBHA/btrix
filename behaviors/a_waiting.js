@@ -51,36 +51,9 @@ class Instagram {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
-    function clickByText(tag, texts) {
-      const elements = Array.from(document.querySelectorAll(tag));
-      for (const el of elements) {
-        const text = el.innerText?.trim();
-        if (texts.includes(text)) {
-          el.click();
-          console.log("Clicked:", text);
-          return true;
-        }
-      }
-      return false;
-    }
+    alert("CUSTOM BEHAVIOR IS RUNNING");
 
-    const texts = ["Not Now", "Not now", "Cancel", "Close", "Dismiss"];
-
-    let attempts = 0;
-    const interval = setInterval(() => {
-      attempts++;
-
-      // Try buttons
-      clickByText("button", texts);
-
-      // Try aria-label close
-      document.querySelectorAll('[aria-label="Close"]').forEach(el => el.click());
-
-      if (attempts > 10) {
-        clearInterval(interval);
-        console.log("Finished modal attempts");
-      }
-    }, 1000);
+    document.body.style.border = "10px solid red";
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
