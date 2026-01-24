@@ -80,7 +80,7 @@ class Instagram {
     document.body.appendChild(banner);
 
     // Perform scrolling to ensure content is captured
-    yield* Lib.autoScroll(ctx);
+    // yield* Lib.autoScroll(ctx);
     
     // Final wait to ensure snapshot captures the red elements
     await new Promise(r => setTimeout(r, 3000));
