@@ -1,5 +1,5 @@
-class Colorize {
-  static id = "Colorize";
+class Instagram {
+  static id = "Instagram";
 
   static isMatch() {
     return true;
