@@ -25,35 +25,21 @@ class Instagram {
     const timeout = 20000;
 
     while (Date.now() - start < timeout) {
-      const done = await this.evaluate(() => {
-        // 1. Try to close modal
-        const btn = [...document.querySelectorAll('button, div, svg')]
-          .find(el =>
-            /not now|cancel|close|continue|log in/i.test(
-              el.innerText || el.getAttribute("aria-label") || ""
-            )
-          );
+      const banner = document.createElement("div");
+      banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
+      banner.style.position = "fixed";
+      banner.style.top = "0";
+      banner.style.left = "0";
+      banner.style.zIndex = "999999";
+      banner.style.background = "red";
+      banner.style.color = "white";
+      banner.style.padding = "10px";
+      document.body.appendChild(banner);
 
-        if (btn) btn.click();
-
-        // 2. Check if dialog still exists
-        return !document.querySelector('div[role="dialog"]');
-      });
-      // const banner = document.createElement("div");
-      // banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
-      // banner.style.position = "fixed";
-      // banner.style.top = "0";
-      // banner.style.left = "0";
-      // banner.style.zIndex = "999999";
-      // banner.style.background = "red";
-      // banner.style.color = "white";
-      // banner.style.padding = "10px";
-      // document.body.appendChild(banner);
-
-      if (done) {
-        console.log("awaitPageLoad: page ready for capture");
-        return;
-      }
+      // if (done) {
+      //   console.log("awaitPageLoad: page ready for capture");
+      //   return;
+      // }
 
       await new Promise(r => setTimeout(r, 1000));
     }
