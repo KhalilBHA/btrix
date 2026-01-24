@@ -33,13 +33,13 @@ class Instagram {
 
     // Handle the "Not Now" button
     const el = document.querySelector('svg[aria-label="Close"]');
-      if (el) {
-        const clickable = el.closest('[role="button"]');
-        log("Custom Behavior: Clicked 'Not Now' button.");
-        clickable.click();
-        // clickable.style.backgroundColor = "red";
-        // return `clicked: ${sel}`;
-      }
+    if (el) {
+      const clickable = el.closest('[role="button"]');
+      log("Custom Behavior: Clicked 'Not Now' button.");
+      clickable.click();
+      // clickable.style.backgroundColor = "red";
+      // return `clicked: ${sel}`;
+    }
     // const btn = Array.from(document.querySelectorAll('button')).find(el => 
     //   el.textContent.includes('Not Now') || el.textContent.includes('Close')
     // );
@@ -78,12 +78,21 @@ class Instagram {
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
 
-    const { log, Lib } = ctx;
-    log("Custom Behavior: run() loop started");
 
-    // Inject the red banner
-    
-    const el = document.querySelector('svg[aria-label="Close"]');
+
+    const removeModal = () => {
+      // const selectors = ['div[role="presentation"]', 'div[role="dialog"]', '.x1n2onr6'];
+      // selectors.forEach(selector => {
+      //   document.querySelectorAll(selector).forEach(el => {
+      //     if (el.textContent.includes("Log In") || el.textContent.includes("Sign Up")) {
+      //       el.remove(); // DELETE the element entirely
+      //     }
+      //   });
+      // });
+      // // Re-enable scrolling which Instagram disables when modal is up
+      // document.body.style.overflow = 'auto';
+      // document.documentElement.style.overflow = 'auto';
+      const el = document.querySelector('svg[aria-label="Close"]');
       if (el) {
         const clickable = el.closest('[role="button"]');
         log("Custom Behavior: Clicked 'Not Now' button.");
@@ -91,12 +100,48 @@ class Instagram {
         // clickable.style.backgroundColor = "red";
         // return `clicked: ${sel}`;
       }
+    };
 
-    // Perform scrolling to ensure content is captured
-    // yield* Lib.autoScroll(ctx);
-    
-    // Final wait to ensure snapshot captures the red elements
-    await new Promise(r => setTimeout(r, 3000));
+    // Run it immediately
+    removeModal();
+
+    // 2. Set an interval to keep deleting it if it tries to come back
+    const interval = setInterval(removeModal, 500);
+
+    // 3. Color your H2s
+    document.querySelectorAll('h2').forEach(h2 => h2.style.color = 'red');
+
+    yield ctx.Lib.getState(ctx, "Modal purged and H2s colorized");
+
+    await new Promise(r => setTimeout(r, 10000));
+    clearInterval(interval);
+
+
+
+
+
+    // const { log, Lib } = ctx;
+    // log("Custom Behavior: run() loop started");
+
+    // // Inject the red banner
+
+    // const el = document.querySelector('svg[aria-label="Close"]');
+    //   if (el) {
+    //     const clickable = el.closest('[role="button"]');
+    //     log("Custom Behavior: Clicked 'Not Now' button.");
+    //     clickable.click();
+    //     // clickable.style.backgroundColor = "red";
+    //     // return `clicked: ${sel}`;
+    //   }
+
+    // // Perform scrolling to ensure content is captured
+    // // yield* Lib.autoScroll(ctx);
+
+    // // Final wait to ensure snapshot captures the red elements
+    // await new Promise(r => setTimeout(r, 3000));
+
+
+
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
