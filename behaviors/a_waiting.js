@@ -1,8 +1,6 @@
 class Colorize {
   static id = "Colorize";
 
-  static runInIframe = true;
-
   static isMatch() {
     return true;
   }
