@@ -21,6 +21,19 @@ class Instagram {
   // post-crawl processing operations, including link extraction, screenshots,
   // and running main behavior
   async awaitPageLoad() {
+
+    console.log("CUSTOM BEHAVIOR: awaitPageLoad reached");
+
+    // Force a real network request that will be archived
+    const url = "/__behavior_test__?t=" + Date.now();
+    console.log("Fetching:", url);
+
+    try {
+      await fetch(url, { mode: "no-cors" });
+      console.log("Fetch triggered");
+    } catch (e) {
+      console.log("Fetch error (still ok):", e.message);
+    }
     // const start = Date.now();
     // const timeout = 20000;
 
@@ -51,9 +64,6 @@ class Instagram {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
-    alert("CUSTOM BEHAVIOR IS RUNNING");
-
-    document.body.style.border = "10px solid red";
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
