@@ -21,36 +21,42 @@ class Instagram {
   // post-crawl processing operations, including link extraction, screenshots,
   // and running main behavior
   async awaitPageLoad() {
-    const start = Date.now();
-    const timeout = 20000;
+    // const start = Date.now();
+    // const timeout = 20000;
 
-    while (Date.now() - start < timeout) {
+    // while (Date.now() - start < timeout) {
 
-      await this.evaluate(() => {
-        if (!document.getElementById("__custom_banner")) {
-          const banner = document.createElement("div");
-          banner.id = "__custom_banner";
-          banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
-          banner.style.position = "fixed";
-          banner.style.top = "0";
-          banner.style.left = "0";
-          banner.style.zIndex = "999999";
-          banner.style.background = "red";
-          banner.style.color = "white";
-          banner.style.padding = "10px";
-          document.body.appendChild(banner);
-        }
-      });
+    //   await this.evaluate(() => {
+    //     if (!document.getElementById("__custom_banner")) {
+    //       const banner = document.createElement("div");
+    //       banner.id = "__custom_banner";
+    //       banner.textContent = "CUSTOM BEHAVIOR ACTIVE";
+    //       banner.style.position = "fixed";
+    //       banner.style.top = "0";
+    //       banner.style.left = "0";
+    //       banner.style.zIndex = "999999";
+    //       banner.style.background = "red";
+    //       banner.style.color = "white";
+    //       banner.style.padding = "10px";
+    //       document.body.appendChild(banner);
+    //     }
+    //   });
 
-      // Exit early so Browsertrix doesn't timeout
-      return;
-    }
+    //   // Exit early so Browsertrix doesn't timeout
+    //   return;
+    // }
   }
 
   async* run(ctx) {
     // Keep it visible for 5 seconds for the crawler to "see" it
     console.log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
+    await ctx.evaluate(() => {
+      const banner = document.createElement("div");
+      banner.innerText = "CUSTOM BEHAVIOR LOADED";
+      banner.style = "position:fixed;top:0;left:0;background:red;color:white;z-index:999999;padding:10px;";
+      document.body.appendChild(banner);
+    });
 
     console.log("Instagram custom behavior loaded");
     // const el = document.querySelector('svg[aria-label="Close"]');
