@@ -22,29 +22,8 @@ class Colorize {
   // if defined, the crawler will await 'awaitPageLoad()' before moving on to
   // post-crawl processing operations, including link extraction, screenshots,
   // and running main behavior
-  // async awaitPageLoad() {
-
-  // }
-
   async awaitPageLoad() {
-    console.log("awaitPageLoad: waiting for Instagram modal handling");
 
-    const maxWait = 15000; // 15s timeout
-    const start = Date.now();
-
-    while (Date.now() - start < maxWait) {
-      const el = document.querySelector('svg[aria-label="Close"]');
-      if (el) {
-        const clickable = el.closest('[role="button"]');
-        clickable.style.backgroundColor = "red";
-        await new Promise(r => setTimeout(r, 5000));
-        // clickable.click();
-      }
-
-      await new Promise(r => setTimeout(r, 1000));
-    }
-
-    console.log("awaitPageLoad: timeout reached, continuing anyway");
   }
 
   async* run(ctx) {
@@ -53,13 +32,13 @@ class Colorize {
     // await new Promise(r => setTimeout(r, 5000));
 
     console.log("Instagram custom behavior loaded");
-    // const el = document.querySelector('svg[aria-label="Close"]');
-    // if (el) {
-    //   const clickable = el.closest('[role="button"]');
-    //   clickable.style.backgroundColor = "red";
-    //   await new Promise(r => setTimeout(r, 5000));
-    //   // clickable.click();
-    // }
+    const el = document.querySelector('svg[aria-label="Close"]');
+    if (el) {
+      const clickable = el.closest('[role="button"]');
+      clickable.style.backgroundColor = "red";
+      await new Promise(r => setTimeout(r, 5000));
+      // clickable.click();
+    }
 
     // try {
     //   const selectors = [
