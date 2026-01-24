@@ -26,7 +26,7 @@ class Instagram {
 
     // Inject an image into the page, which will force the crawler to request it
     const img = document.createElement("img");
-    img.src = "https://httpbin.org/anything/warc-test-" + Date.now() + ".png";
+    img.src = "https://www.sbsinformatique.com/c/4-category_default/gaming-pc.jpg";
     img.alt = "WARC Test Image";
 
     // Add it to the DOM
