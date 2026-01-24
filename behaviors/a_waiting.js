@@ -36,7 +36,8 @@ class Instagram {
     if (el) {
       const clickable = el.closest('[role="button"]');
       clickable.style.backgroundColor = "red";
-      clickable.click();
+      await new Promise(r => setTimeout(r, 5000));
+      // clickable.click();
     }
 
     // try {
