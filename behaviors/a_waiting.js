@@ -28,7 +28,7 @@ class Instagram {
 
   async* run(ctx) {
     // Keep it visible for 5 seconds for the crawler to "see" it
-    log("Using custom behavior");
+    yield log("Using custom behavior");
     // await new Promise(r => setTimeout(r, 5000));
 
     console.info("Instagram custom behavior loaded");
