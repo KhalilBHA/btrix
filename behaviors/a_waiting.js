@@ -1,5 +1,5 @@
-class Colorize {
-  static id = "Colorize";
+class Instagram {
+  static id = "Instagram";
 
   static runInIframe = true;
 
@@ -14,7 +14,7 @@ class Colorize {
   // optional: if true, will also check isMatch() and possibly run
   // this behavior in each iframe.
   // if false, or not defined, this behavior will be skipped for iframes.
-  static runInIframe = false;
+  static runInIframe = true;
 
   // optional: if defined, provides a way to define a custom way to determine
   // when a page has finished loading beyond the standard 'load' event.
